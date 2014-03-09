@@ -815,6 +815,16 @@ bool CTxMemPool::accept(CValidationState &state, CTransaction &tx, bool fCheckIn
         EraseFromWallets(ptxOld->GetHash());
     SyncWithWallets(hash, tx, NULL, true);
 
+
+    // add support for -txnotify
+    std::string strCmd = GetArg("-txnotify", "");
+    
+    if (!strCmd.empty())
+    {
+        boost::replace_all(strCmd, "%s", hash.ToString());
+        boost::thread t(runCommand, strCmd); // thread runs free
+    }
+
     return true;
 }
 
